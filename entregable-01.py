@@ -441,20 +441,25 @@ def psr_backtracking_ac3_mrv(psr):
                     return False
         return True
 
+
+
     def heuristica_seleccion_variable_y_resto(asig, resto):
 
-
         numero_valores_consistentes= {x:0 for x in resto}
-
         for i in resto:
             dominio_variable = psr.dominios[i]
             for val in dominio_variable:
                 if consistente(psr, i, val, asig):
                     numero_valores_consistentes[i]=numero_valores_consistentes.get(i)+1
+
         print('# Valores consistentes: ',numero_valores_consistentes)
         minimo_numero = min(numero_valores_consistentes.values())
+
         print(minimo_numero)
+
         opciones_minimas = []
+
+        opcion = -1
         for k in numero_valores_consistentes.keys():
             if numero_valores_consistentes.get(k) == minimo_numero:
                 opciones_minimas.append(k)
@@ -463,32 +468,34 @@ def psr_backtracking_ac3_mrv(psr):
         else:
             opcion = opciones_minimas[0]
 
-        print('OPCION: ',opcion)
-
-        print('Opcion con menos consistentes: ', opciones_minimas)
-
+        # print('Opcion con menos consistentes: ', opciones_minimas)
+        print("----------OPCION: ",opcion)
 
 
 
-        variable = resto[0]
 
+        # variable = resto[0]
+        # nuevo_resto = resto[1:]
+        variable = opcion
         dom_var = psr.dominios[variable]
-        nuevo_resto = resto[1:]
+        nuevo_resto = resto
+        nuevo_resto.remove(variable)
 
-        #print('Variable: ', variable, '\nDominio variable:', dom_var, '\nResto: ', resto, '\n------------')
 
-        return variable, nuevo_resto, dom_var
+        print('Variable: ', variable, '\nDominio variable:', dom_var, '\nResto: ', nuevo_resto, '\n------------')
+
+        return option, nuevo_resto, dom_var
 
 
 
 
     def psr_backtracking_rec(asig, resto):
-        print('Asignacion Parcial', asig)
 
         if resto == []:
-            print('Fin')
+            print('Asignacion Final', asig)
             return asig
         else:
+            print('Asignacion Parcial', asig)
             variable, nuevo_resto, dom_var = heuristica_seleccion_variable_y_resto(asig, resto)
             # variable = resto[0]
             # nuevo_resto = resto[1:]
