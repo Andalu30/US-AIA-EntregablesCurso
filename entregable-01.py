@@ -510,12 +510,20 @@ def psr_backtracking_ac3_mrv(psr):
         print('Asig: ',asig)
         print('var_y_doms_w_asig: ', variables_y_dominios, '\t Variable: ',variable)
 
-        test = AC3_parcial(psr, variables_y_dominios)
-        print('AC3: ', test)
+        ac3sol = AC3_parcial(psr, variables_y_dominios)
+        print('AC3: ', ac3sol)
+
+
+
+        for i in ac3sol:
+            psr.dominios[i] = ac3sol[i]
+            psr.dominios = {**psr.dominios, **copia_asig}
+
+
 
         print(psr.dominios)
 
-        #test = AC3(psr,)
+
         return None
 
 
