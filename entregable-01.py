@@ -425,10 +425,16 @@ def psr_backtracking_ac3_mrv(psr):
     # una variable, se aplica AC3 sobre los dominios de las restantes variables
     # para propagar restricciones. Como heurística para elegir la siguiente
     # variable a asignar, usar MRV (desempatando aleatoriamente).
+
+
+    # una variable, se aplica AC3 sobre los dominios de las restantes variables
+    # para propagar restricciones.
+
     """
-    Función que aplica backtracking recursivo con AC3 sobre los dominios y MRV como heurística
+    Función que aplica backtracking recursivo con seleccion de variable mediante la heurística MRV y ademas, aplica AC3
+    sobre los dominios de las restantes variables.
     :param psr: PSR de entrada
-    :return: Solucion al PSR de entrada tras aplicar el algoritmo
+    :return: None ó solución al PSR de entrada tras aplicar el algoritmo.
     """
 
     def consistente(psr, var, val, asig):
@@ -441,10 +447,16 @@ def psr_backtracking_ac3_mrv(psr):
                     return False
         return True
 
-
-
     def heuristica_seleccion_variable_y_resto(asig, resto):
+        """
+        Función que calcula la siguiente variable a escoger según el algoritmo MRV
+        :param asig: Asignacion hasta el momento del algoritmo recursivo.
+        :param resto: Resto de variables que aun quedan por asignar.
+        :return: Devuelve la variable seleccionada, el nuevo resto y el dominio de la variable seleccionada.
+        """
 
+        # Recorremos el resto y comprobamos cuantas variables de su dominio son
+        # consistentes para guardarlas en un diccionario.
         numero_valores_consistentes= {x:0 for x in resto}
         for i in resto:
             dominio_variable = psr.dominios[i]
@@ -452,61 +464,86 @@ def psr_backtracking_ac3_mrv(psr):
                 if consistente(psr, i, val, asig):
                     numero_valores_consistentes[i]=numero_valores_consistentes.get(i)+1
 
-        print('# Valores consistentes: ',numero_valores_consistentes)
+        # Comprobamos cual es la variable con menos variables consistentes.
         minimo_numero = min(numero_valores_consistentes.values())
+        # print('Valores consistentes: ',numero_valores_consistentes, 'Min:',minimo_numero)
 
-        print(minimo_numero)
-
+        # Es posible que haya mas de una variable con el mismo numero de consistencias, las guardamos todas en una lista
         opciones_minimas = []
-
-        opcion = -1
         for k in numero_valores_consistentes.keys():
             if numero_valores_consistentes.get(k) == minimo_numero:
                 opciones_minimas.append(k)
-        if len(opciones_minimas)!=1:
+
+        # Si está sola seleccionamos esa y sino seleccionamos una al azar.
+        if len(opciones_minimas) > 1:
             opcion = random.choice(opciones_minimas)
         else:
             opcion = opciones_minimas[0]
 
-        # print('Opcion con menos consistentes: ', opciones_minimas)
-        print("----------OPCION: ",opcion)
 
-
-
-
-        # variable = resto[0]
-        # nuevo_resto = resto[1:]
         variable = opcion
         dom_var = psr.dominios[variable]
-        nuevo_resto = resto
+        nuevo_resto = resto.copy()
         nuevo_resto.remove(variable)
 
+        # print('Variable: ', variable, '\nResto: ', nuevo_resto)
 
-        print('Variable: ', variable, '\nDominio variable:', dom_var, '\nResto: ', nuevo_resto, '\n------------')
-
-        return option, nuevo_resto, dom_var
+        return opcion, nuevo_resto, dom_var
 
 
+
+    def aplica_ac3_dominios(psr, variable, nuevo_resto, dom_var,asig):
+        # cada vez que se asigna un valor a
+        # una variable, se aplica AC3 sobre los dominios de las restantes variables
+        # para propagar restricciones.
+
+
+        variables_y_dominios = {x:psr.dominios[x] for x in nuevo_resto}
+        copia_asig = asig.copy()
+
+
+        for i in copia_asig:
+            copia_asig[i] = [copia_asig[i]]
+
+        variables_y_dominios = {**variables_y_dominios,**copia_asig}
+
+        print('Asig: ',asig)
+        print('var_y_doms_w_asig: ', variables_y_dominios, '\t Variable: ',variable)
+
+        test = AC3_parcial(psr, variables_y_dominios)
+        print('AC3: ', test)
+
+        print(psr.dominios)
+
+        #test = AC3(psr,)
+        return None
 
 
     def psr_backtracking_rec(asig, resto):
-
         if resto == []:
-            print('Asignacion Final', asig)
+            print('Asignacion Final: ', asig)
             return asig
         else:
-            print('Asignacion Parcial', asig)
+            print('Asignacion Parcial: ', asig)
             variable, nuevo_resto, dom_var = heuristica_seleccion_variable_y_resto(asig, resto)
             # variable = resto[0]
             # nuevo_resto = resto[1:]
 
+
+            aplica_ac3_dominios(psr, variable, nuevo_resto, dom_var,asig)
+
+
+
             for val in dom_var:
                 if consistente(psr, variable, val, asig):
                     asig[variable] = val
+                    # print('ASIG: ', asig,'\n------------------------')
                     result = psr_backtracking_rec(asig, nuevo_resto)
                     if result is not None:
                         return result
-                    del asig[variable]
+                    else:
+                        # print('del', asig[variable], 'ASIG:',asig)
+                        del asig[variable]
             return None
 
     sol = psr_backtracking_rec(dict(), psr.variables)
