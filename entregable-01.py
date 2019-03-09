@@ -492,7 +492,7 @@ def psr_backtracking_ac3_mrv(psr):
 
 
 
-    def aplica_ac3_dominios(psr, variable, nuevo_resto, dom_var,asig):
+    def aplica_ac3_dominios(psr, nuevo_resto,asig):
         # cada vez que se asigna un valor a
         # una variable, se aplica AC3 sobre los dominios de las restantes variables
         # para propagar restricciones.
@@ -501,14 +501,14 @@ def psr_backtracking_ac3_mrv(psr):
         variables_y_dominios = {x:psr.dominios[x] for x in nuevo_resto}
         copia_asig = asig.copy()
 
-
         for i in copia_asig:
             copia_asig[i] = [copia_asig[i]]
+
 
         variables_y_dominios = {**variables_y_dominios,**copia_asig}
 
         print('Asig: ',asig)
-        print('var_y_doms_w_asig: ', variables_y_dominios, '\t Variable: ',variable)
+        print('var_y_doms_w_asig: ', variables_y_dominios)
 
         ac3sol = AC3_parcial(psr, variables_y_dominios)
         print('AC3: ', ac3sol)
@@ -538,11 +538,10 @@ def psr_backtracking_ac3_mrv(psr):
             # nuevo_resto = resto[1:]
 
 
-            aplica_ac3_dominios(psr, variable, nuevo_resto, dom_var,asig)
-
-
-
             for val in dom_var:
+                restorepoint_doms_psr = psr.dominios
+                aplica_ac3_dominios(psr, nuevo_resto, asig)
+
                 if consistente(psr, variable, val, asig):
                     asig[variable] = val
                     # print('ASIG: ', asig,'\n------------------------')
@@ -551,6 +550,7 @@ def psr_backtracking_ac3_mrv(psr):
                         return result
                     else:
                         # print('del', asig[variable], 'ASIG:',asig)
+                        psr.dominios = restorepoint_doms_psr
                         del asig[variable]
             return None
 
