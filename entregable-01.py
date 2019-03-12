@@ -507,11 +507,11 @@ def psr_backtracking_ac3_mrv(psr):
 
         variables_y_dominios = {**variables_y_dominios,**copia_asig}
 
-        print('Asig: ',asig)
-        print('var_y_doms_w_asig: ', variables_y_dominios)
+        #print('Asig: ',asig)
+        #print('var_y_doms_w_asig: ', variables_y_dominios)
 
         ac3sol = AC3_parcial(psr, variables_y_dominios)
-        print('AC3: ', ac3sol)
+        #print('AC3: ', ac3sol)
 
 
 
@@ -521,7 +521,7 @@ def psr_backtracking_ac3_mrv(psr):
 
 
 
-        print(psr.dominios)
+        #print(psr.dominios)
 
 
         return None
@@ -529,10 +529,10 @@ def psr_backtracking_ac3_mrv(psr):
 
     def psr_backtracking_rec(asig, resto):
         if resto == []:
-            print('Asignacion Final: ', asig)
+            #print('Asignacion Final: ', asig)
             return asig
         else:
-            print('Asignacion Parcial: ', asig)
+            #print('Asignacion Parcial: ', asig)
             variable, nuevo_resto, dom_var = heuristica_seleccion_variable_y_resto(asig, resto)
             # variable = resto[0]
             # nuevo_resto = resto[1:]
@@ -762,3 +762,73 @@ def sudoku3():
 # +-------------------+
 
 
+def psr_sudoku(puestas):
+
+
+    def sudoku_restrictions(x, y):
+        return rest_horizontal(x, y) #and rest_vertical(x,y)) and rest_cuadrado(x,y);
+
+
+    def rest_horizontal(x,y):
+        fila_act = x.split("_")[1]
+        print(fila_act)
+
+
+        return lambda u,v: (u,v) != (x,y)
+
+
+
+
+    #Los dominios son [1..9] salvo en los que ya hay decidida una opcion
+    dominios = {}
+    for i in range(1, 10):
+        for j in range(1, 10):
+            dominios[("x_" + str(i) + "_" + str(j))] = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    for (x,y) in puestas:
+        dominios[("x_" + str(x) + "_" + str(y))] = [puestas[(x, y)]]
+
+
+    restricciones = {}
+
+    for i in dominios.keys():
+        for j in dominios.keys():
+            if i is not j:
+                restricciones[(i, j)] = sudoku_restrictions(i, j)
+
+
+
+
+    print('Dominios: ',dominios)
+    print('Restricciones: ', restricciones)
+
+    return PSR(dominios,restricciones)
+
+
+
+def imprime_sudoku(sol):
+    mem = [[0]*9]*9
+    for i in sol.keys():
+        # print(i)
+        x = int(str(i).split("_")[1])#coord x del string key
+        y = int(str(i).split("_")[2])#coord y del string key
+        # print(x,y)
+        # print('Lo que habia: ',mem[x-1][y-1])
+        # print('lo que hay que poner: ',sol[i])
+        # print('lo que se queda:', mem[x-1][y-1])
+
+        print(sol[i])
+        mem[x-1][y-1] = sol[i]
+
+    print('\nPinta sudoku:')
+    for k in mem:
+        print(k)
+
+
+
+
+psr_sud1 = psr_sudoku(sudoku1())
+solpsr = psr_backtracking_ac3_mrv(psr_sud1)
+
+print(solpsr)
+
+imprime_sudoku(solpsr)
