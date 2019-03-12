@@ -766,28 +766,38 @@ def psr_sudoku(puestas):
 
 
     def sudoku_restrictions(x, y):
-        return  lambda u,v: (rest_horizontal(x,y,u,v) and rest_vertical(x,y,u,v) and rest_cuadrados(x,y,u,v)) #and rest_cuadrado(x,y);
+        return  lambda u,v: (rest_horizontal(x,y,u,v) and rest_vertical(x,y,u,v) and rest_cuadrados(x,y,u,v))
 
     def rest_horizontal(x,y,u,v):
-        if x[0] == y[0]:
+        xx = x[0]
+        yx = y[0]
+
+        if xx is yx:
             return u != v
         else:
             return u != -1 #Por poner algo
 
     def rest_vertical(x,y,u,v):
-        if x[1] == y[1]:
+        xy = x[1]
+        yy = y[1]
+        if xy is yy:
             return u != v
         else:
             return u != -1 #Por poner algo
 
     def rest_cuadrados(x,y,u,v):
+        xx = x[0]
+        yx = y[0]
+        xy = x[1]
+        yy = y[1]
+
         limites = [3,6,9]
         #TODO cambiar esto
         for z in limites:
             if(x[0] <=z and y[0] <=z and x[1] <=z and y[1] <=z):
                 return u != v
             else:
-                return fuckthis()
+                return u != -1
 
 
 
@@ -850,9 +860,35 @@ def imprimesudoku(sud):
             sol[x-1][y-1] = a[(x, y)]
             print(sol)
 
+
+
         print('\nSolucion al sudoku:')
+        print("+-------------------+\n|",end='')
+
+        #Spaguetti
+        aux = 0
+        aux2 = 0
+        aux3 = 0
         for k in sol:
-            print(k)
+            if aux3 == 3:
+                print("|-------------------|")
+                aux3 = 0
+            aux3 = aux3+1
+            for l in k:
+                if aux == 3:
+                    print("|",end='')
+                    aux = 0
+                print("{}|".format(l),end='')
+                aux = aux+1
+                aux2 = aux2+1
+                if aux2 == 9:
+                    print('')
+                    aux2 = 0
+            print("|-------------------|")
+
+        print("+-------------------+")
+
+
 
 
 resuelve_sudoku(sudoku1())
