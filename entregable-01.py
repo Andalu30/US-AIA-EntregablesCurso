@@ -766,15 +766,28 @@ def psr_sudoku(puestas):
 
 
     def sudoku_restrictions(x, y):
-        return rest_horizontal(x, y) #and rest_vertical(x,y)) and rest_cuadrado(x,y);
+        return  lambda u,v: (rest_horizontal(x,y,u,v) and rest_vertical(x,y,u,v) and rest_cuadrados(x,y,u,v)) #and rest_cuadrado(x,y);
 
+    def rest_horizontal(x,y,u,v):
+        if x[0] == y[0]:
+            return u != v
+        else:
+            return u != -1 #Por poner algo
 
-    def rest_horizontal(x,y):
-        fila_act = x.split("_")[1]
-        print(fila_act)
+    def rest_vertical(x,y,u,v):
+        if x[1] == y[1]:
+            return u != v
+        else:
+            return u != -1 #Por poner algo
 
-
-        return lambda u,v: (u,v) != (x,y)
+    def rest_cuadrados(x,y,u,v):
+        limites = [3,6,9]
+        #TODO cambiar esto
+        for z in limites:
+            if(x[0] <=z and y[0] <=z and x[1] <=z and y[1] <=z):
+                return u != v
+            else:
+                return fuckthis()
 
 
 
@@ -783,52 +796,79 @@ def psr_sudoku(puestas):
     dominios = {}
     for i in range(1, 10):
         for j in range(1, 10):
-            dominios[("x_" + str(i) + "_" + str(j))] = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+            dominios[(i,j)] = [1, 2, 3, 4, 5, 6, 7, 8, 9]
     for (x,y) in puestas:
-        dominios[("x_" + str(x) + "_" + str(y))] = [puestas[(x, y)]]
+        dominios[(x,y)] = [puestas[(x, y)]]
 
 
     restricciones = {}
 
-    for i in dominios.keys():
-        for j in dominios.keys():
-            if i is not j:
-                restricciones[(i, j)] = sudoku_restrictions(i, j)
+    for x1 in range(1,10):
+        for y1 in range(1,10):
+            for x2 in range(x1,10):
+                for y2 in range(y1,10):
+                    if (x1,y1) != (x2,y2):
+                        restricciones[(x1, y1),(x2,y2)] = sudoku_restrictions((x1,y1),(x2,y2))
 
 
 
 
-    print('Dominios: ',dominios)
-    print('Restricciones: ', restricciones)
+    # print('Dominios: ', dominios)
+    # print('Restricciones: ', restricciones)
 
     return PSR(dominios,restricciones)
 
 
 
-def imprime_sudoku(sol):
-    mem = [[0]*9]*9
-    for i in sol.keys():
-        # print(i)
-        x = int(str(i).split("_")[1])#coord x del string key
-        y = int(str(i).split("_")[2])#coord y del string key
-        # print(x,y)
-        # print('Lo que habia: ',mem[x-1][y-1])
-        # print('lo que hay que poner: ',sol[i])
-        # print('lo que se queda:', mem[x-1][y-1])
-
-        print(sol[i])
-        mem[x-1][y-1] = sol[i]
-
-    print('\nPinta sudoku:')
-    for k in mem:
-        print(k)
 
 
+# Usando esta función y el algoritmo de backtracking con AC3 y MRV anterior,
+# definir una función "resuelve_sudoku(puestas)" que resuelva Sudokus. Esta
+# función debe dibujar la solución encontrada.
 
 
-psr_sud1 = psr_sudoku(sudoku1())
-solpsr = psr_backtracking_ac3_mrv(psr_sud1)
+def resuelve_sudoku(puestas):
+    psr_sud = psr_sudoku(puestas)
+    solpsr = psr_backtracking_ac3_mrv(psr_sud)
+    print('Solucion PSR: ',solpsr)
+    imprimesudoku(solpsr)
 
-print(solpsr)
 
-imprime_sudoku(solpsr)
+def imprimesudoku(sud):
+    if sud == 'No tiene solución':
+        print('El sudoku no tiene solución')
+    else:
+        #Inicializamos la matriz con ceros
+        sol = [[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]]
+
+        a = {}
+        for (x,y) in sorted(sud):
+            a[(x,y)] = sud[(x,y)]
+        print(a)
+
+        for (x,y) in a:
+            sol[x-1][y-1] = a[(x, y)]
+            print(sol)
+
+        print('\nSolucion al sudoku:')
+        for k in sol:
+            print(k)
+
+
+resuelve_sudoku(sudoku1())
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
