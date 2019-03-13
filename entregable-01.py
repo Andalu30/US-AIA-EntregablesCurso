@@ -6,7 +6,6 @@
 #  Copyright (c) 2019. All rights reserved.
 
 
-
 # Ampliación de Inteligencia Artificial
 # Problemas de Satisfacción de Restricciones
 # Dpto. de C. de la Computación e I.A. (Univ. de Sevilla)
@@ -24,7 +23,6 @@
 # piden. Si se entregan con un nombre distintoo con funcn otro nombre, 
 # el entregable no será evaluado.
 # --------------------------------------------------------------------
-
 
 
 ## ###################################################################
@@ -45,7 +43,6 @@
 ## ###################################################################
 
 
-
 # -----------------------------------------------------------------------
 
 # Lo que sigue es el código visto en la práctica 01 de clase, incluyendo:
@@ -54,6 +51,7 @@
 # - Implementación del algoritmo AC-3
 
 import random
+
 
 class PSR:
     """Clase que describe un problema de satisfacción de
@@ -97,52 +95,48 @@ class PSR:
 def n_reinas(n):
     """Devuelve el PSR correspondiente al problema de las n-reinas"""
 
-    def n_reinas_restriccion(x,y):
-        return lambda u,v: (abs(x-y) != abs(u-v) and u != v)
+    def n_reinas_restriccion(x, y):
+        return lambda u, v: (abs(x - y) != abs(u - v) and u != v)
 
-    doms = {x:list(range(1,n+1)) for x in range(1,n+1)}
+    doms = {x: list(range(1, n + 1)) for x in range(1, n + 1)}
     restrs = dict()
-    for x in range(1,n):
-        for y in range(x+1,n+1):
-            restrs[(x,y)] = n_reinas_restriccion(x,y)
-    return PSR(doms,restrs)
-
-
+    for x in range(1, n):
+        for y in range(x + 1, n + 1):
+            restrs[(x, y)] = n_reinas_restriccion(x, y)
+    return PSR(doms, restrs)
 
 
 def dibuja_tablero_n_reinas(asig):
     """Dibuja el tablero de ajedrez a partir de una solución almacenada en asig"""
-    
 
-    def cadena_fila(i,asig):
-        cadena="|"
-        for j in range (1,n+1):
-            if asig[i]==j:
+    def cadena_fila(i, asig):
+        cadena = "|"
+        for j in range(1, n + 1):
+            if asig[i] == j:
                 cadena += "X|"
             else:
                 cadena += " |"
         return cadena
-    
-    n=len(asig)
-    print("+"+"-"*(2*n-1)+"+")
-    for i in range(1,n):
-        print(cadena_fila(i,asig))
-        print("|"+"-"*(2*n-1)+"|")
-    print(cadena_fila(n,asig))
-    print("+"+"-"*(2*n-1)+"+")
+
+    n = len(asig)
+    print("+" + "-" * (2 * n - 1) + "+")
+    for i in range(1, n):
+        print(cadena_fila(i, asig))
+        print("|" + "-" * (2 * n - 1) + "|")
+    print(cadena_fila(n, asig))
+    print("+" + "-" * (2 * n - 1) + "+")
 
 
-
-
-
-def arcos (psr):
+def arcos(psr):
     return {(x, y) for x in psr.variables for y in psr.vecinos[x]}
+
 
 def restriccion_arco(psr, x, y):
     if (x, y) in psr.restricciones:
         return psr.restricciones[(x, y)]
     else:
         return lambda vx, vy: psr.restricciones[(y, x)](vy, vx)
+
 
 def AC3(psr, doms):
     """Procedimiento para hacer arco consistente un problema de
@@ -152,7 +146,7 @@ def AC3(psr, doms):
     cola = arcos(psr)
     while cola:
         (x, y) = cola.pop()
-        func = restriccion_arco(psr,x, y)
+        func = restriccion_arco(psr, x, y)
         dom_previo_x = doms[x]
         mod_dom_x = False
         dom_nuevo_x = []
@@ -165,8 +159,10 @@ def AC3(psr, doms):
             doms[x] = dom_nuevo_x
             cola.update((z, x) for z in psr.vecinos[x] if z != y)
     return doms
+
+
 # ----------------------------------------------------------------------------
-    
+
 
 # ----------------------------------------------------------------------
 # Ejercicio 1
@@ -193,8 +189,6 @@ def AC3(psr, doms):
 # {2: [1, 2], 3: [3, 4]}
 
 
-
-
 def AC3_parcial(psr, doms):
     """
     Actualiza los dominos de manera que todos los arcos sean consistentes. Destructiva sobre los dominios.
@@ -214,7 +208,7 @@ def AC3_parcial(psr, doms):
         if x not in doms.keys() or y not in doms.keys():
             continue
 
-        func = restriccion_arco(psr,x, y)
+        func = restriccion_arco(psr, x, y)
         dom_previo_x = doms[x]
         mod_dom_x = False
         dom_nuevo_x = []
@@ -229,45 +223,44 @@ def AC3_parcial(psr, doms):
     return doms
 
 
-
 # ----------------------------------------------------------------------
 # Ejercicio 2
 # -----------------------------------------------------------------------
-            
+
 # La siguiente función implementa un algoritmo recursivo de backtracking
 # básico para la resolución de problema de satisfacción de restricciones:
 
 
 def psr_backtracking(psr):
-    """Backtracking simple para problemas de satisfacción de restricciones""" 
+    """Backtracking simple para problemas de satisfacción de restricciones"""
 
-    def consistente(psr,var,val,asig):
+    def consistente(psr, var, val, asig):
         for x in asig:
-            if (var,x) in psr.restricciones:
-                if not psr.restricciones[(var,x)](val,asig[x]):
+            if (var, x) in psr.restricciones:
+                if not psr.restricciones[(var, x)](val, asig[x]):
                     return False
-            elif (x,var) in psr.restricciones:
-                if not psr.restricciones[(x,var)](asig[x],val):
+            elif (x, var) in psr.restricciones:
+                if not psr.restricciones[(x, var)](asig[x], val):
                     return False
         return True
 
-    def psr_backtracking_rec(asig,resto):
-        if resto==[]:
+    def psr_backtracking_rec(asig, resto):
+        if resto == []:
             return asig
         else:
             var = resto[0]
-            nuevo_resto=resto[1:]
-            dom_var=psr.dominios[var]
-            for val in dom_var: 
-                if consistente(psr,var,val,asig): 
-                    asig[var]=val   
-                    result= psr_backtracking_rec(asig,nuevo_resto)
+            nuevo_resto = resto[1:]
+            dom_var = psr.dominios[var]
+            for val in dom_var:
+                if consistente(psr, var, val, asig):
+                    asig[var] = val
+                    result = psr_backtracking_rec(asig, nuevo_resto)
                     if result is not None:
                         return result
                     del asig[var]
             return None
-            
-    sol=psr_backtracking_rec(dict(),psr.variables)
+
+    sol = psr_backtracking_rec(dict(), psr.variables)
     if sol is None:
         print("No tiene solución")
     return sol
@@ -416,20 +409,7 @@ def psr_backtracking(psr):
 # +---------------------------+
 
 
-
-
 def psr_backtracking_ac3_mrv(psr):
-    # Se pide implementar una función psr_backtracking_ac3_mrv(psr) que devuelva
-    # una solución a un psr (o None si no tiene solución), aplicando el algoritmo
-    # de backtracking recursivo en el que además cada vez que se asigna un valor a
-    # una variable, se aplica AC3 sobre los dominios de las restantes variables
-    # para propagar restricciones. Como heurística para elegir la siguiente
-    # variable a asignar, usar MRV (desempatando aleatoriamente).
-
-
-    # una variable, se aplica AC3 sobre los dominios de las restantes variables
-    # para propagar restricciones.
-
     """
     Función que aplica backtracking recursivo con seleccion de variable mediante la heurística MRV y ademas, aplica AC3
     sobre los dominios de las restantes variables.
@@ -457,12 +437,12 @@ def psr_backtracking_ac3_mrv(psr):
 
         # Recorremos el resto y comprobamos cuantas variables de su dominio son
         # consistentes para guardarlas en un diccionario.
-        numero_valores_consistentes= {x:0 for x in resto}
+        numero_valores_consistentes = {x: 0 for x in resto}
         for i in resto:
             dominio_variable = psr.dominios[i]
             for val in dominio_variable:
                 if consistente(psr, i, val, asig):
-                    numero_valores_consistentes[i]=numero_valores_consistentes.get(i)+1
+                    numero_valores_consistentes[i] = numero_valores_consistentes.get(i) + 1
 
         # Comprobamos cual es la variable con menos variables consistentes.
         minimo_numero = min(numero_valores_consistentes.values())
@@ -480,7 +460,6 @@ def psr_backtracking_ac3_mrv(psr):
         else:
             opcion = opciones_minimas[0]
 
-
         variable = opcion
         dom_var = psr.dominios[variable]
         nuevo_resto = resto.copy()
@@ -490,53 +469,39 @@ def psr_backtracking_ac3_mrv(psr):
 
         return opcion, nuevo_resto, dom_var
 
-
-
-    def aplica_ac3_dominios(psr, nuevo_resto,asig):
-        # cada vez que se asigna un valor a
-        # una variable, se aplica AC3 sobre los dominios de las restantes variables
-        # para propagar restricciones.
-
-
-        variables_y_dominios = {x:psr.dominios[x] for x in nuevo_resto}
+    def aplica_ac3_dominios(psr, nuevo_resto, asig):
+        """
+        Funcion que aplica AC3 sobre los dominios una vez se ha decidido la variable con heuristica_seleccion_variable_y_resto
+        :param psr: PSR del problema
+        :param nuevo_resto: Resto de variables que aun no se han seleccionado
+        :param asig: Asignacion hasta el momento del algoritmo de backtracking
+        :return: Devuelve None. Los dominios son modificados!
+        """
+        # Recojemos las variables y dominios que qudan y los que ya han sido seleccionados
+        variables_y_dominios = {x: psr.dominios[x] for x in nuevo_resto}
         copia_asig = asig.copy()
 
         for i in copia_asig:
             copia_asig[i] = [copia_asig[i]]
 
+        variables_y_dominios = {**variables_y_dominios, **copia_asig}
 
-        variables_y_dominios = {**variables_y_dominios,**copia_asig}
-
-        #print('Asig: ',asig)
-        #print('var_y_doms_w_asig: ', variables_y_dominios)
-
+        # Aplicamos AC3 a los dominios
         ac3sol = AC3_parcial(psr, variables_y_dominios)
-        #print('AC3: ', ac3sol)
 
-
-
+        # Modificamos los dominios con la solucion del AC3
         for i in ac3sol:
             psr.dominios[i] = ac3sol[i]
             psr.dominios = {**psr.dominios, **copia_asig}
-
-
-
-        #print(psr.dominios)
-
-
         return None
-
 
     def psr_backtracking_rec(asig, resto):
         if resto == []:
-            #print('Asignacion Final: ', asig)
+            # print('Asignacion Final: ', asig)
             return asig
         else:
-            #print('Asignacion Parcial: ', asig)
+            # print('Asignacion Parcial: ', asig)
             variable, nuevo_resto, dom_var = heuristica_seleccion_variable_y_resto(asig, resto)
-            # variable = resto[0]
-            # nuevo_resto = resto[1:]
-
 
             for val in dom_var:
                 restorepoint_doms_psr = psr.dominios
@@ -549,37 +514,19 @@ def psr_backtracking_ac3_mrv(psr):
                     if result is not None:
                         return result
                     else:
-                        # print('del', asig[variable], 'ASIG:',asig)
                         psr.dominios = restorepoint_doms_psr
                         del asig[variable]
             return None
 
     sol = psr_backtracking_rec(dict(), psr.variables)
     if sol is None:
-        print("No tiene solución")
+        print("El PSR no tiene solución")
     return sol
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Ejercicio 3
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 # Un sudoku es una cuadrícula 9x9, dividida en 9 subcuadrículas 3x3 y en la
 # que algunas casillas contienen un número del 1 al 9 y el resto están en
@@ -623,10 +570,11 @@ def psr_backtracking_ac3_mrv(psr):
 #                 +-------------------+
 
 def sudoku1():
-    return {(1,2):7, (1,4):8, (1,5):5, (2,2):3, (2,7):5, (2,9):7,
-            (3,6):7, (3,8):6, (4,1):4, (4,9):1, (5,1):2, (5,2):9,
-            (5,3):3, (5,9):4, (6,4):7, (6,6):6, (6,8):9, (7,3):2,
-            (7,4):1, (7,5):3, (7,6):9, (8,7):1, (9,1):1, (9,4):2}
+    return {(1, 2): 7, (1, 4): 8, (1, 5): 5, (2, 2): 3, (2, 7): 5, (2, 9): 7,
+            (3, 6): 7, (3, 8): 6, (4, 1): 4, (4, 9): 1, (5, 1): 2, (5, 2): 9,
+            (5, 3): 3, (5, 9): 4, (6, 4): 7, (6, 6): 6, (6, 8): 9, (7, 3): 2,
+            (7, 4): 1, (7, 5): 3, (7, 6): 9, (8, 7): 1, (9, 1): 1, (9, 4): 2}
+
 
 # >>> resuelve_sudoku(sudoku1())
 # +-------------------+
@@ -676,11 +624,12 @@ def sudoku1():
 #                 +-------------------+
 
 def sudoku2():
-    return {(1,1):5, (1,2):3, (1,5):7, (2,1):6, (2,4):1, (2,5):9,
-            (2,6):5, (3,2):9, (3,3):8, (3,8):6, (4,1):8, (4,5):6,
-            (4,9):3, (5,1):4, (5,4):8, (5,6):3, (5,9):1, (6,1):7,
-            (6,5):2, (6,9):6, (7,2):6, (7,7):2, (7,8):8, (8,4):4,
-            (8,5):1, (8,6):9, (8,9):5, (9,5):8, (9,8):7, (9,9):9}
+    return {(1, 1): 5, (1, 2): 3, (1, 5): 7, (2, 1): 6, (2, 4): 1, (2, 5): 9,
+            (2, 6): 5, (3, 2): 9, (3, 3): 8, (3, 8): 6, (4, 1): 8, (4, 5): 6,
+            (4, 9): 3, (5, 1): 4, (5, 4): 8, (5, 6): 3, (5, 9): 1, (6, 1): 7,
+            (6, 5): 2, (6, 9): 6, (7, 2): 6, (7, 7): 2, (7, 8): 8, (8, 4): 4,
+            (8, 5): 1, (8, 6): 9, (8, 9): 5, (9, 5): 8, (9, 8): 7, (9, 9): 9}
+
 
 # >>> resuelve_sudoku(sudoku2())
 # +-------------------+
@@ -731,14 +680,15 @@ def sudoku2():
 
 
 def sudoku3():
-    return {(1,1):9, (1,2):5, (1,7):6, (1,8):7, (2,6):7, (2,7):3,
-            (2,8):1, (3,1):8, (3,4):5, (3,5):6, (3,6):1, (4,1):2,
-            (4,2):3, (5,3):9, (5,7):1, (6,8):3, (6,9):7, (7,4):1,
-            (7,5):4, (7,6):5, (7,9):9, (8,2):9, (8,3):4, (8,4):2,
-            (9,2):8, (9,3):5, (9,8):2, (9,9):1}
+    return {(1, 1): 9, (1, 2): 5, (1, 7): 6, (1, 8): 7, (2, 6): 7, (2, 7): 3,
+            (2, 8): 1, (3, 1): 8, (3, 4): 5, (3, 5): 6, (3, 6): 1, (4, 1): 2,
+            (4, 2): 3, (5, 3): 9, (5, 7): 1, (6, 8): 3, (6, 9): 7, (7, 4): 1,
+            (7, 5): 4, (7, 6): 5, (7, 9): 9, (8, 2): 9, (8, 3): 4, (8, 4): 2,
+            (9, 2): 8, (9, 3): 5, (9, 8): 2, (9, 9): 1}
+
 
 # >>> resuelve_sudoku(sudoku3())
-    
+
 # +-------------------+
 # |9|5|1||3|2|4||6|7|8|
 # |-------------------|
@@ -763,109 +713,136 @@ def sudoku3():
 
 
 def psr_sudoku(puestas):
-
+    """
+    Función creadora de PSR para sudokus
+    :param puestas: Diccionario con las coordenadas y valores de las casillas inicialmente rellenadas
+    :return: Devuelve el PSR del sudoku
+    """
 
     def sudoku_restrictions(x, y):
-        return  lambda u,v: (rest_horizontal(x,y,u,v) and rest_vertical(x,y,u,v) and rest_cuadrados(x,y,u,v))
+        return lambda u, v: (rest_horizontal(x, y, u, v) and rest_vertical(x, y, u, v) and rest_cuadrados(x, y, u, v))
 
-    def rest_horizontal(x,y,u,v):
+    def rest_horizontal(x, y, u, v):
         xx = x[0]
         yx = y[0]
 
         if xx is yx:
             return u != v
         else:
-            return u != -1 #Por poner algo
+            return u != -1  # Por poner algo
 
-    def rest_vertical(x,y,u,v):
+    def rest_vertical(x, y, u, v):
         xy = x[1]
         yy = y[1]
         if xy is yy:
             return u != v
         else:
-            return u != -1 #Por poner algo
+            return u != -1  # Por poner algo
 
-    def rest_cuadrados(x,y,u,v):
+    def rest_cuadrados(x, y, u, v):
         xx = x[0]
-        yx = y[0]
-        xy = x[1]
+        yx = x[1]
+
+        xy = y[0]
         yy = y[1]
 
-        limites = [3,6,9]
-        #TODO cambiar esto
-        for z in limites:
-            if(x[0] <=z and y[0] <=z and x[1] <=z and y[1] <=z):
-                return u != v
+        def func1(u, v):
+            return u != v
+
+        def func2(u, v):
+            return u != -1
+
+        def det_cuadrante(xx, yx, xy, yy):
+            if   3 >= xx > 0 and 3 >= yx > 0 and 3 >= xy > 0 and 3 >= yy > 0:
+                return 1
+            elif 6 >= xx > 3 and 3 >= yx > 0 and 6 >= xy > 3 and 3 >= yy > 0:
+                return 2
+            elif 9 >= xx > 6 and 3 >= yx > 0 and 9 >= xy > 6 and 3 >= yy > 0:
+                return 3
+
+            elif 3 >= xx > 0 and 6 >= yx > 3 and 3 >= xy > 0 and 6 >= yy > 3:
+                return 4
+            elif 6 >= xx > 3 and 6 >= yx > 3 and 6 >= xy > 3 and 6 >= yy > 3:
+                return 5
+            elif 9 >= xx > 6 and 6 >= yx > 3 and 9 >= xy > 6 and 6 >= yy > 3:
+                return 6
+
+            elif 3 >= xx > 0 and 9 >= yx > 6 and 3 >= xy > 0 and 9 >= yy > 6:
+                return 7
+            elif 6 >= xx > 3 and 9 >= yx > 6 and 6 >= xy > 3 and 9 >= yy > 6:
+                return 8
+            elif 9 >= xx > 6 and 9 >= yx > 6 and 9 >= xy > 6 and 9 >= yy > 6:
+                return 9
             else:
-                return u != -1
+                return 0
 
+        switch = {0: func2(u, v), 1: func1(u, v), 2: func1(u, v), 3: func1(u, v), 4: func1(u, v), 5: func1(u, v),
+                  6: func1(u, v), 7: func1(u, v),
+                  8: func1(u, v), 9: func1(u, v)}
 
+        return switch.get(det_cuadrante(xx, yx, xy, yy))
 
-
-    #Los dominios son [1..9] salvo en los que ya hay decidida una opcion
+    # Los dominios son [1..9] salvo en los que ya hay decidida una opcion
     dominios = {}
     for i in range(1, 10):
         for j in range(1, 10):
-            dominios[(i,j)] = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-    for (x,y) in puestas:
-        dominios[(x,y)] = [puestas[(x, y)]]
-
+            dominios[(i, j)] = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    for (x, y) in puestas:
+        dominios[(x, y)] = [puestas[(x, y)]]
 
     restricciones = {}
+    for x in range(1, 10):  # (x,_),(_,_)
+        for y in range(1, 10):  # (_,y),(_,_)
 
-    for x1 in range(1,10):
-        for y1 in range(1,10):
-            for x2 in range(x1,10):
-                for y2 in range(y1,10):
-                    if (x1,y1) != (x2,y2):
-                        restricciones[(x1, y1),(x2,y2)] = sudoku_restrictions((x1,y1),(x2,y2))
+            for i in range(x, 10):  # (_,_),(i,_) x para impedir repetidos
+                for j in range(y, 10):  # (_,_),(_,j) y para impedir repetidos
 
+                    if (x, y) != (i, j):
+                        restricciones[(x, y), (i, j)] = sudoku_restrictions((x, y), (i, j))
 
-
-
-    # print('Dominios: ', dominios)
-    # print('Restricciones: ', restricciones)
-
-    return PSR(dominios,restricciones)
-
-
-
-
-
-# Usando esta función y el algoritmo de backtracking con AC3 y MRV anterior,
-# definir una función "resuelve_sudoku(puestas)" que resuelva Sudokus. Esta
-# función debe dibujar la solución encontrada.
+    return PSR(dominios, restricciones)
 
 
 def resuelve_sudoku(puestas):
+    """
+    Función encargada de recibir un sudoku y resolverlo
+    :param puestas: Diccionario con las posiciones y valores de las casillas inicialmente rellenadas
+    :return: Devuelve por consola la solución al sudoku
+    """
     psr_sud = psr_sudoku(puestas)
     solpsr = psr_backtracking_ac3_mrv(psr_sud)
-    print('Solucion PSR: ',solpsr)
     imprimesudoku(solpsr)
 
 
 def imprimesudoku(sud):
-    if sud == 'No tiene solución':
+    if sud is None:
         print('El sudoku no tiene solución')
     else:
-        #Inicializamos la matriz con ceros
-        sol = [[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]]
+        # Inicializamos la matriz con ceros
+        sol = [[0, 0, 0, 0, 0, 0, 0, 0, 0],
+               [0, 0, 0, 0, 0, 0, 0, 0, 0],
+               [0, 0, 0, 0, 0, 0, 0, 0, 0],
+               [0, 0, 0, 0, 0, 0, 0, 0, 0],
+               [0, 0, 0, 0, 0, 0, 0, 0, 0],
+               [0, 0, 0, 0, 0, 0, 0, 0, 0],
+               [0, 0, 0, 0, 0, 0, 0, 0, 0],
+               [0, 0, 0, 0, 0, 0, 0, 0, 0],
+               [0, 0, 0, 0, 0, 0, 0, 0, 0]]
 
+        # Ordenamos la solucion
         a = {}
-        for (x,y) in sorted(sud):
-            a[(x,y)] = sud[(x,y)]
-        print(a)
+        for (x, y) in sorted(sud):
+            a[(x, y)] = sud[(x, y)]
+        # print(a)
 
-        for (x,y) in a:
-            sol[x-1][y-1] = a[(x, y)]
+        # Volcamos la solucion a la matriz
+        for (x, y) in a:
+            sol[x - 1][y - 1] = a[(x, y)]
             print(sol)
 
-
-
+        # Spaguetti
         print('\nSolucion al sudoku:')
-        print("+-------------------+\n|",end='')
-
-        #Spaguetti
+        print("+-------------------+\n|", end='')
         aux = 0
         aux2 = 0
         aux3 = 0
@@ -873,38 +850,22 @@ def imprimesudoku(sud):
             if aux3 == 3:
                 print("|-------------------|")
                 aux3 = 0
-            aux3 = aux3+1
+            aux3 = aux3 + 1
             for l in k:
                 if aux == 3:
-                    print("|",end='')
+                    print("|", end='')
                     aux = 0
-                print("{}|".format(l),end='')
-                aux = aux+1
-                aux2 = aux2+1
+                print("{}|".format(l), end='')
+                aux = aux + 1
+                aux2 = aux2 + 1
                 if aux2 == 9:
                     print('')
                     aux2 = 0
             print("|-------------------|")
-
         print("+-------------------+")
 
 
-
-
-resuelve_sudoku(sudoku1())
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+if __name__ == "__main__":
+    resuelve_sudoku(sudoku2())
+    # resuelve_sudoku(sudoku2())
+    # resuelve_sudoku(sudoku2())
