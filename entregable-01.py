@@ -1,8 +1,7 @@
 #!/usr/bin/python
 # -*- coding: ISO-8859-15 -*-
 
-#  Developed by Juan Arteaga Carmona on 5/03/19 16:15
-#  Last modified 5/03/19 16:12.
+#  Developed by Juan Arteaga Carmona on 13/03/19 18:23
 #  Copyright (c) 2019. All rights reserved.
 
 
@@ -719,68 +718,44 @@ def psr_sudoku(puestas):
     :return: Devuelve el PSR del sudoku
     """
 
-    def sudoku_restrictions(x, y):
-        return lambda u, v: (rest_horizontal(x, y, u, v) and rest_vertical(x, y, u, v) and rest_cuadrados(x, y, u, v))
+    def tienenRestriccionEntreEllas(x, y, i, j):
+        return rest_horizontal(x, y, i, j) or rest_vertical(x, y, i, j) or rest_cuadrados(x, y, i, j)
 
     def rest_horizontal(x, y, u, v):
-        xx = x[0]
-        yx = y[0]
-
-        if xx is yx:
-            return u != v
+        if x is i:
+            return True
         else:
-            return u != -1  # Por poner algo
+            return False
 
     def rest_vertical(x, y, u, v):
-        xy = x[1]
-        yy = y[1]
-        if xy is yy:
-            return u != v
+        if y is v:
+            return True
         else:
-            return u != -1  # Por poner algo
+            return False
 
     def rest_cuadrados(x, y, u, v):
-        xx = x[0]
-        yx = x[1]
+        if 3 >= x > 0 and 3 >= y > 0 and 3 >= u > 0 and 3 >= v > 0:
+            return True  # Primer cuadrante
+        elif 6 >= x > 3 and 3 >= y > 0 and 6 >= u > 3 and 3 >= v > 0:
+            return True  # Segundo cuadrante
+        elif 9 >= x > 6 and 3 >= y > 0 and 9 >= u > 6 and 3 >= v > 0:
+            return True  # Tercer comentario
 
-        xy = y[0]
-        yy = y[1]
+        elif 3 >= x > 0 and 6 >= y > 3 and 3 >= u > 0 and 6 >= v > 3:
+            return True  # Cuarto cuadrante
+        elif 6 >= x > 3 and 6 >= y > 3 and 6 >= u > 3 and 6 >= v > 3:
+            return True  # Cuadrante central
+        elif 9 >= x > 6 and 6 >= y > 3 and 9 >= u > 6 and 6 >= v > 3:
+            return True  # Sexto cuadrante
 
-        def func1(u, v):
-            return u != v
-
-        def func2(u, v):
-            return u != -1
-
-        def det_cuadrante(xx, yx, xy, yy):
-            if   3 >= xx > 0 and 3 >= yx > 0 and 3 >= xy > 0 and 3 >= yy > 0:
-                return 1
-            elif 6 >= xx > 3 and 3 >= yx > 0 and 6 >= xy > 3 and 3 >= yy > 0:
-                return 2
-            elif 9 >= xx > 6 and 3 >= yx > 0 and 9 >= xy > 6 and 3 >= yy > 0:
-                return 3
-
-            elif 3 >= xx > 0 and 6 >= yx > 3 and 3 >= xy > 0 and 6 >= yy > 3:
-                return 4
-            elif 6 >= xx > 3 and 6 >= yx > 3 and 6 >= xy > 3 and 6 >= yy > 3:
-                return 5
-            elif 9 >= xx > 6 and 6 >= yx > 3 and 9 >= xy > 6 and 6 >= yy > 3:
-                return 6
-
-            elif 3 >= xx > 0 and 9 >= yx > 6 and 3 >= xy > 0 and 9 >= yy > 6:
-                return 7
-            elif 6 >= xx > 3 and 9 >= yx > 6 and 6 >= xy > 3 and 9 >= yy > 6:
-                return 8
-            elif 9 >= xx > 6 and 9 >= yx > 6 and 9 >= xy > 6 and 9 >= yy > 6:
-                return 9
-            else:
-                return 0
-
-        switch = {0: func2(u, v), 1: func1(u, v), 2: func1(u, v), 3: func1(u, v), 4: func1(u, v), 5: func1(u, v),
-                  6: func1(u, v), 7: func1(u, v),
-                  8: func1(u, v), 9: func1(u, v)}
-
-        return switch.get(det_cuadrante(xx, yx, xy, yy))
+        elif 3 >= x > 0 and 9 >= y > 6 and 3 >= u > 0 and 9 >= v > 6:
+            return True  # Septipo cuadrante
+        elif 6 >= x > 3 and 9 >= y > 6 and 6 >= u > 3 and 9 >= v > 6:
+            return True  # Octavo cuadrante
+        elif 9 >= x > 6 and 9 >= y > 6 and 9 >= u > 6 and 9 >= v > 6:
+            return True  # Noveno cuadrante
+        else:
+            return False
 
     # Los dominios son [1..9] salvo en los que ya hay decidida una opcion
     dominios = {}
@@ -791,14 +766,17 @@ def psr_sudoku(puestas):
         dominios[(x, y)] = [puestas[(x, y)]]
 
     restricciones = {}
-    for x in range(1, 10):  # (x,_),(_,_)
-        for y in range(1, 10):  # (_,y),(_,_)
 
-            for i in range(x, 10):  # (_,_),(i,_) x para impedir repetidos
-                for j in range(y, 10):  # (_,_),(_,j) y para impedir repetidos
+    # Todas las variables con todas, si tienen restricciones entre ellas, entonces, insertar esa restriccion en el dict.
+    for x in range(1, 10):              # (x,_),(_,_)
+        for y in range(1, 10):          # (_,y),(_,_)
+
+            for i in range(1, 10):      # (_,_),(i,_)
+                for j in range(1, 10):  # (_,_),(_,j)
 
                     if (x, y) != (i, j):
-                        restricciones[(x, y), (i, j)] = sudoku_restrictions((x, y), (i, j))
+                        if tienenRestriccionEntreEllas(x, y, i, j):
+                            restricciones[(x, y), (i, j)] = lambda u, v: u != v
 
     return PSR(dominios, restricciones)
 
@@ -815,6 +793,11 @@ def resuelve_sudoku(puestas):
 
 
 def imprimesudoku(sud):
+    """
+    Función encargada de imrpimir un sudoku por pantalla
+    :param sud: Diccionario con posiciones y valores de un sudoku resuelto
+    :return: None. La funcion imprime por pantalla los sudokus.
+    """
     if sud is None:
         print('El sudoku no tiene solución')
     else:
@@ -838,10 +821,10 @@ def imprimesudoku(sud):
         # Volcamos la solucion a la matriz
         for (x, y) in a:
             sol[x - 1][y - 1] = a[(x, y)]
-            print(sol)
+            # print(sol)
 
-        # Spaguetti
-        print('\nSolucion al sudoku:')
+        # Spaguetti para que la solución se imprima igual que en los ejemplos
+        print('\nSolución al sudoku:')
         print("+-------------------+\n|", end='')
         aux = 0
         aux2 = 0
@@ -861,11 +844,12 @@ def imprimesudoku(sud):
                 if aux2 == 9:
                     print('')
                     aux2 = 0
-            print("|-------------------|")
+            if k is not sol[8]:
+                print("|-------------------|")
         print("+-------------------+")
 
 
 if __name__ == "__main__":
+    resuelve_sudoku(sudoku1())
     resuelve_sudoku(sudoku2())
-    # resuelve_sudoku(sudoku2())
-    # resuelve_sudoku(sudoku2())
+    resuelve_sudoku(sudoku3())
