@@ -4,8 +4,8 @@
 # ===================================================================
 
 # *******************************************************************
-# APELLIDOS:
-# NOMBRE: 
+# APELLIDOS: Arteaga Carmona
+# NOMBRE: Juan
 # *******************************************************************
 
 
@@ -55,6 +55,7 @@
 
 import random
 
+
 class MDP(object):
 
     """La clase genérica MDP tiene como métodos la función de recompensa R,
@@ -76,9 +77,11 @@ class MDP(object):
         self.descuento=descuento
 
     def R(self,estado):
+        """Devuelve la recompensa"""
         pass
 
     def A(self,estado):
+        """Devuelve las acciones aplicables"""
         pass
         
     def T(self,estado,accion):
@@ -92,6 +95,7 @@ class Rica_y_Conocida(MDP):
         # RC: rica y conocida, RD: rica y desconocida, 
         # PC: pobre y conocida, PD: pobre y desconocida 
         self.Rdict={"RC":10,"RD":10,"PC":0,"PD":0}
+
         self.Tdict={("RC","No publicidad"):[("RC",0.5),("RD",0.5)],
                     ("RC","Gastar en publicidad"):[("PC",1)],
                     ("RD","No publicidad"):[("RD",0.5),("PD",0.5)],
@@ -111,7 +115,6 @@ class Rica_y_Conocida(MDP):
     def T(self,estado,accion):
         return self.Tdict[(estado,accion)]
         
-        
 
 def valoración_respecto_política(pi,mdp, k):
     """Calcula una aproximación a la valoración de los estados respecto de la
@@ -121,7 +124,7 @@ def valoración_respecto_política(pi,mdp, k):
     for _ in range(k):
         V1 = V.copy()
         for s in mdp.estados:
-            V[s] = R(s) + gamma *(sum([p * V1[s1] for (s1,p) in T(s, pi[s])]))
+            V[s] = R(s) + gamma *(sum([p * V1[s1] for (s1, p) in T(s, pi[s])]))
     return V
 
 
@@ -129,34 +132,22 @@ def valoración_respecto_política(pi,mdp, k):
 # Estos son algunos ejemplos de ejecución del código anterior, visto en la práctica 3.
 
 # >>> mdp_ryc=Rica_y_Conocida()
-
-# >>> pi_ryc_ahorra={"RC":"No publicidad","RD":"No publicidad",
-#                    "PC":"No publicidad","PD":"No publicidad"}
-
-# >>> pi_ryc_2={"RC":"No publicidad","RD":"Gastar en publicidad",
-#               "PC":"No publicidad","PD":"Gastar en publicidad"}
-
-# >>> pi_ryc_gastar={"RC":"Gastar en publicidad","RD":"Gastar en publicidad",
-#                  "PC":"Gastar en publicidad","PD":"Gastar en publicidad"}
-
+# >>> pi_ryc_ahorra={"RC":"No publicidad","RD":"No publicidad","PC":"No publicidad","PD":"No publicidad"}
+# >>> pi_ryc_2={"RC":"No publicidad","RD":"Gastar en publicidad","PC":"No publicidad","PD":"Gastar en publicidad"}
+# >>> pi_ryc_gastar={"RC":"Gastar en publicidad","RD":"Gastar en publicidad","PC":"Gastar en publicidad","PD":"Gastar en publicidad"}
 # >>> valoración_respecto_política(pi_ryc_ahorra,mdp_ryc,200)
-
 #{'PC': 14.876033057851238,
 # 'PD': 0.0,
 # 'RC': 33.05785123966942,
 # 'RD': 18.18181818181818}
 
-
 # >>> valoración_respecto_política(pi_ryc_2,mdp_ryc,200)
-
 #{'PC': 35.887499973543456,
 # 'PD': 29.362499973543454,
 # 'RC': 50.387499973543456,
 # 'RD': 39.36249997354345}
 
-
 # >>> valoración_respecto_política(pi_ryc_gastar,mdp_ryc,200)
-
 # {'PC': 0.0, 'PD': 0.0, 'RC': 10.0, 'RD': 10.0}
 
 
@@ -187,13 +178,100 @@ def valoración_respecto_política(pi,mdp, k):
 # - k: el número de iteraciones que se han de aplicar cada vez que se llame a 
 #   la función auxiliar "valoración_respecto_política"
 
- 
+
 
 # Comparar la política óptima que se obtiene para el ejemplo de "Rica y conocida"
 # con las políticas de los ejemplos anteriores y las valoraciones obtenidas.
-# Comentar los resultados.   
+# Comentar los resultados.
+# ---------------------------------------------------------
+
+import time
+
+def iteración_de_políticas(mdp,k):
+    """
+    :param mdp: Objeto de la clase MDP
+    :param k: Numero de iteraciones que se han de aplicar cada vez que se llame a la funcion auxiliar valoración_respecto_política
+    :return: Diccionario con valoracion de los estados, Diccionario con política óptima.
+    """
+
+    def argmax(list, function):
+        return max(list, key=function)
+
+    def valoracion_accion_funcion(pi_s, estado, mdp, funcionValoracion):
+        """ Encuentra la valoración esperada de una acción respecto de una función de valoración V"""
+        aux = sum((p * funcionValoracion[e] for (e, p) in mdp.T(estado, pi_s)))
+        return aux
+
+
+    estadosMdp = mdp.estados
+
+    #Politica optima, inicialmente random
+    dictPoliticaOptima = {x:random.choice(mdp.A(x)) for x in estadosMdp}
+
+    # Valoracion de la politica optima, incialmente a 0
+    dictValoracionEstados = {x:0 for x in estadosMdp}
+
+    #Algoritmo pag 84 diapositivas
+    puntoInicial = time.time()
+    while True:
+        dictValoracionEstados = valoración_respecto_política(dictPoliticaOptima,mdp, k)
+        # print("valoracion respecto a politica: {}".format(dictValoracionEstados))
+        actializada = False
+
+        for estado in estadosMdp:
+            pi_s = argmax(mdp.A(estado), lambda x: valoracion_accion_funcion(x, estado, mdp, dictValoracionEstados))
+            # print("pi_s: ",pi_s)
+
+            if pi_s != dictPoliticaOptima[estado]:
+                dictPoliticaOptima[estado] = pi_s
+                actializada = True
+
+            dentrobucle = time.time()
+            if dentrobucle-puntoInicial>3:
+                break
+
+        if not actializada:
+            return dictPoliticaOptima, dictValoracionEstados
+
+
+
+
+mdp_ryc=Rica_y_Conocida()
+
+print("\n---Política del metodo de iteracion de políticas---\n")
+
+politica,valoracion = iteración_de_políticas(mdp_ryc,200)
+print("Politica óptima: \t\t{}".format(politica))
+print("Con una valoracion de: {}".format(valoracion))
+
+
+#-----------------------------------------------
+print("\n---Políticas de los ejemplos anteriores---")
+
+pi_ryc_ahorra = {"RC": "No publicidad", "RD": "No publicidad", "PC": "No publicidad", "PD": "No publicidad"}
+print("\nPolítica de ahorro: \t{}".format(pi_ryc_ahorra))
+print("Con una valoracion de: {}".format(valoración_respecto_política(pi_ryc_ahorra,mdp_ryc,200)))
+
+pi_ryc_2={"RC":"No publicidad","RD":"Gastar en publicidad","PC":"No publicidad","PD":"Gastar en publicidad"}
+print("\nPolítica 2: \t\t\t{}".format(pi_ryc_2))
+print("Con una valoracion de: {}".format(valoración_respecto_política(pi_ryc_2,mdp_ryc,200)))
+
+pi_ryc_gastar={"RC":"Gastar en publicidad","RD":"Gastar en publicidad","PC":"Gastar en publicidad","PD":"Gastar en publicidad"}
+print("\nPolítica gastar: \t\t{}".format(pi_ryc_gastar))
+print("Con una valoracion de: {}".format(valoración_respecto_política(pi_ryc_gastar,mdp_ryc,200)))
+
+print("\n---Comentario---")
+print("Como se puede observar, la valoración de la política optima es "
+      "mayor que todas las valoraciones de los ejemplos anteriores.\n"
+      "Esto se debe a que hemos aplicado el algoritmo de iteración de políticas "
+      "y, por lo tanto, hemos encontrado la política que hace que estos valores sean máximos.")
 
 # --------------------------------------------------------------------------
+
+
+
+
+
 
 
 
@@ -215,7 +293,7 @@ def valoración_respecto_política(pi,mdp, k):
 # Aplicar el algoritmo anterior para encontrar políticas óptimas para
 # problemas de movimiento de robot en rejillas como el descrito en las
 # diapositivas. Supondremos una cuadrícula como la que se describe en la
-# diapositiva 72. 
+# diapositiva 72.
 
 # Definir una función 
 #     "politica_óptima_cuadrícula(recompensa,ruido,descuento,iter)" 
@@ -235,8 +313,159 @@ def valoración_respecto_política(pi,mdp, k):
 # se coloca la flecha que describe la acción que recomienda la política óptima 
 # que se ha calculado.             
 
-# Lo siguiente es un ejemplo de resultados obtenidos
 
+class MovimientoRobot(MDP):
+
+    def __init__(self, recompensa, ruido, descuento):
+
+        self.Rdict = {"11": recompensa, "12": recompensa, "13": recompensa, "14": 1,
+                      "21": recompensa, "22": -100000000, "23": recompensa, "24": -1,
+                      "31": recompensa, "32": recompensa, "33": recompensa, "34": recompensa}
+
+        mitad_ruido = ruido/2.
+
+        self.Tdict = {("11", "arriba"):     [("11", 1 - mitad_ruido), ("12", mitad_ruido)],
+                      ("11", "abajo"):      [("21", 1 - ruido),       ("11", mitad_ruido), ("12", mitad_ruido)],
+                      ("11", "izquierda"):  [("11", 1 - mitad_ruido), ("21", mitad_ruido)],
+                      ("11", "derecha"):    [("12", 1 - ruido),       ("11", mitad_ruido), ("21", mitad_ruido)],
+
+                      ("12", "arriba"):     [("12", 1 - ruido), ("11", mitad_ruido), ("13", mitad_ruido)],
+                      ("12", "abajo"):      [("12", 1 - ruido), ("11", mitad_ruido), ("13", mitad_ruido)],
+                      ("12", "izquierda"):  [("11", 1 - ruido), ("12", ruido)],
+                      ("12", "derecha"):    [("13", 1 - ruido), ("12", ruido)],
+
+                      ("13", "arriba"):     [("13", 1 - ruido), ("12", mitad_ruido), ("14", mitad_ruido)],
+                      ("13", "abajo"):      [("23", 1 - ruido), ("14", mitad_ruido), ("12", mitad_ruido)],
+                      ("13", "izquierda"):  [("12", 1 - ruido), ("13", mitad_ruido), ("23", mitad_ruido)],
+                      ("13", "derecha"):    [("14", 1 - ruido), ("13", mitad_ruido), ("23", mitad_ruido)],
+
+                      # ("14", "arriba"): [("14", 1 - mitad_ruido), ("13", mitad_ruido)],
+                      # ("14", "abajo"): [("24", 1 - ruido), ("13", mitad_ruido), ("14", mitad_ruido)],
+                      # ("14", "izquierda"): [("13", 1 - ruido), ("14", mitad_ruido), ("24", mitad_ruido)],
+                      # ("14", "derecha"): [("14", 1 - mitad_ruido), ("24", mitad_ruido)],
+
+                      ("14", "arriba"):     [],
+                      ("14", "abajo"):      [],
+                      ("14", "izquierda"):  [],
+                      ("14", "derecha"):    [],
+
+                      ("21", "arriba"):     [("11", 1 - ruido), ("21", ruido)],
+                      ("21", "abajo"):      [("31", 1 - ruido), ("21", ruido)],
+                      ("21", "izquierda"):  [("21", 1 - ruido), ("11", mitad_ruido), ("31", mitad_ruido)],
+                      ("21", "derecha"):    [("21", 1 - ruido), ("11", mitad_ruido), ("31", mitad_ruido)],
+
+                    # nunca se llega al 22
+                    #   ("22", "arriba"): [("22", 1.)],
+                    #   ("22", "abajo"): [("22", 1.)],
+                    #   ("22", "izquierda"): [("22", 1.)],
+                    #   ("22", "derecha"): [("22", 1.)],
+
+                      ("23", "arriba"):     [("13", 1 - ruido), ("23", mitad_ruido), ("24", mitad_ruido)],
+                      ("23", "abajo"):      [("33", 1 - ruido), ("23", mitad_ruido), ("24", mitad_ruido)],
+                      ("23", "izquierda"):  [("23", 1 - ruido), ("13", mitad_ruido), ("33", mitad_ruido)],
+                      ("23", "derecha"):    [("24", 1 - ruido), ("13", mitad_ruido), ("23", mitad_ruido)],
+
+                      ("24", "arriba"): [("14", 1 - ruido), ("24", mitad_ruido), ("23", mitad_ruido)],
+                      ("24", "abajo"): [("34", 1 - ruido), ("23", mitad_ruido), ("23", mitad_ruido)],
+                      ("24", "izquierda"): [("23", 1 - ruido), ("34", mitad_ruido), ("14", mitad_ruido)],
+                      ("24", "derecha"): [("24", 1 - ruido), ("34", mitad_ruido), ("14", mitad_ruido)],
+
+                      # ("24", "arriba"):     [],
+                      # ("24", "abajo"):      [],
+                      # ("24", "izquierda"):  [],
+                      # ("24", "derecha"):    [],
+
+
+                      ("31", "arriba"):     [("21", 1 - ruido),       ("31", mitad_ruido), ("32", mitad_ruido)],
+                      ("31", "abajo"):      [("31", 1 - mitad_ruido), ("32", mitad_ruido)],
+                      ("31", "izquierda"):  [("31", 1 - mitad_ruido), ("21", mitad_ruido)],
+                      ("31", "derecha"):    [("32", 1 - ruido),       ("31", mitad_ruido), ("21", mitad_ruido)],
+
+                      ("32", "arriba"):     [("32", 1 - ruido), ("31", mitad_ruido), ("33", mitad_ruido)],
+                      ("32", "abajo"):      [("32", 1 - ruido), ("31", mitad_ruido), ("33", mitad_ruido)],
+                      ("32", "izquierda"):  [("31", 1 - ruido), ("32", ruido)],
+                      ("32", "derecha"):    [("33", 1 - ruido), ("32", ruido)],
+
+                      ("33", "arriba"):     [("23", 1 - ruido), ("32", mitad_ruido), ("34", mitad_ruido)],
+                      ("33", "abajo"):      [("33", 1 - ruido), ("32", mitad_ruido), ("34", mitad_ruido)],
+                      ("33", "izquierda"):  [("32", 1 - ruido), ("23", mitad_ruido), ("33", mitad_ruido)],
+                      ("33", "derecha"):    [("34", 1 - ruido), ("33", mitad_ruido), ("23", mitad_ruido)],
+
+                      ("34", "arriba"):     [("24", 1 - ruido),       ("34", mitad_ruido), ("33", mitad_ruido)],
+                      ("34", "abajo"):      [("34", 1 - mitad_ruido), ("33", mitad_ruido)],
+                      ("34", "izquierda"):  [("33", 1 - ruido),       ("34", mitad_ruido), ("24", mitad_ruido)],
+                      ("34", "derecha"):    [("34", 1 - mitad_ruido), ("24", mitad_ruido)],
+                      }
+
+        super().__init__(["11", "12", "13", "14", "21", "23", "24", "31", "32", "33", "34"], descuento)
+
+    def R(self, estado):
+        return self.Rdict[estado]
+
+    def A(self, estado):
+        return ["arriba", "abajo", "izquierda", "derecha"]
+
+    def T(self, estado, accion):
+        return self.Tdict[(estado, accion)]
+
+
+def política_óptima_cuadrícula(recompensa=-0.04,ruido=0.2,descuento=0.9,iter=100):
+    """
+    :param recompensa: Recompensa asociada a las casillas no terminales, por defecto -0.04
+    :param ruido: Probabilidad de que al aplicarse una accion, el robot vaya a una de las casillas perpendiculares, por defecto es 0.2, 0.1 por cada perpendicular
+    :param descuento: Tasa de descuento aplicada, por defecto 0.9
+    :param iter: Numero de iteraciones a realizar cada vez que se estima la valoracion asocuada a una politica, por defecto 100-
+    :return: void. Imprime por pantalla la cuadrícula.
+    """
+
+    def dibujaCuadricula(dict):
+        """Encargada de dibujar la cuadrícula solucion"""
+        flechas = {"arriba": "↑",
+                   "abajo": "↓",
+                   "izquierda": "←",
+                   "derecha": "→"
+                   }
+
+        print("-----------------")
+        print("| " + flechas[dict["11"]]+" | "              + flechas[dict["12"]]+" | " + flechas[dict["13"]]   +" | " + " "+" |")
+        print("-----------------")
+        print("| " + flechas[dict["21"]]+" | " + "*" +" | " + flechas[dict["23"]]+" | " + " "                   +" |")
+        print("-----------------")
+        print("| " + flechas[dict["31"]]+" | "              + flechas[dict["32"]]+" | " + flechas[dict["33"]]   +" | " + flechas[dict["34"]]+" |")
+        print("-----------------")
+
+    if recompensa > 0:
+        print("Es posible que se entre en un bucle infinito ya que la recompensa es positiva.\n"
+              "A los 3 segundos se saldrá del bucle.")
+
+
+    mdp_robot = MovimientoRobot(recompensa, ruido, descuento)
+    politica, valoracion = iteración_de_políticas(mdp_robot, iter)
+
+    print("Recompensa: {}, Ruido: {}, Descuento: {}, Iteraciones: {}".format(recompensa,ruido,descuento,iter))
+    dibujaCuadricula(politica)
+
+
+def ejemplosEj2():
+    print("\nEjemplo1:")
+    política_óptima_cuadrícula(descuento=1)
+
+    print("\nEjemplo2:")
+    política_óptima_cuadrícula(recompensa=-2,descuento=1)
+
+    print("\nEjemplo3:")
+    política_óptima_cuadrícula(recompensa=-0.1)
+
+    print("\nEjemplo4:")
+    política_óptima_cuadrícula(recompensa=10)
+
+    print("\nEjemplo5:")
+    política_óptima_cuadrícula(ruido=0.6)
+
+ejemplosEj2()
+
+
+# Lo siguiente es un ejemplo de resultados obtenidos
 # >>> política_óptima_cuadrícula(descuento=1)
 
 # -----------------
