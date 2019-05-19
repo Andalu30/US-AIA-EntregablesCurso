@@ -2,9 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8209abe1-a462-4295-8169-df6a720a3007" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/entregable-01.py" beforeDir="false" afterPath="$PROJECT_DIR$/entregable-01.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -32,11 +31,18 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/entregable-01.py">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/entregable-02.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="72">
-              <caret line="3" selection-start-line="3" selection-end-line="3" />
+            <state relative-caret-position="-10777" />
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/.gitignore">
+          <provider selected="true" editor-type-id="text-editor">
+            <state>
+              <caret column="5" lean-forward="true" selection-start-column="5" selection-end-column="5" />
             </state>
           </provider>
         </entry>
@@ -51,8 +57,14 @@
     </findStrings>
   </component>
   <component name="Git.Settings">
+    <option name="PREVIOUS_COMMIT_AUTHORS">
+      <list>
+        <option value="Juan Arteaga Carmona &lt;juan.arteaga41567@gmail.com&gt;" />
+      </list>
+    </option>
     <option name="UPDATE_TYPE" value="REBASE" />
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="SIGN_OFF_COMMIT" value="true" />
   </component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/entregable-01.py" root0="FORCE_HIGHLIGHTING" />
@@ -62,6 +74,7 @@
       <list>
         <option value="$PROJECT_DIR$/entregable-01_mod.py" />
         <option value="$PROJECT_DIR$/entregable-01.py" />
+        <option value="$PROJECT_DIR$/.gitignore" />
       </list>
     </option>
   </component>
@@ -74,7 +87,20 @@
     <navigator proportions="" version="1">
       <foldersAlwaysOnTop value="true" />
     </navigator>
-    <panes />
+    <panes>
+      <pane id="Scope" />
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="US-AIA-EntregablesCurso" type="b2602c69:ProjectViewProjectNode" />
+              <item name="US-AIA-EntregablesCurso" type="462c0819:PsiDirectoryNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
+    </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
@@ -105,7 +131,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.entregable-01">
+  <component name="RunManager" selected="Python.entregable-02">
     <configuration default="true" type="PythonConfigurationType" factoryName="Python">
       <module name="US-AIA-Entregables" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -132,6 +158,9 @@
       <module name="US-AIA-EntregablesCurso" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
       <option name="SDK_HOME" value="/usr/bin/python3.7" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="true" />
@@ -169,8 +198,28 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="entregable-02" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="US-AIA-EntregablesCurso" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="/usr/bin/python3.7" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/entregable-02.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="true" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.entregable-02" />
         <item itemvalue="Python.entregable-01" />
         <item itemvalue="Python.entregable-01" />
         <item itemvalue="Python.entregable-01_mod" />
@@ -198,6 +247,7 @@
       <workItem from="1552404441630" duration="4292000" />
       <workItem from="1552486259583" duration="818000" />
       <workItem from="1552493900303" duration="3291000" />
+      <workItem from="1558260314436" duration="113000" />
     </task>
     <task id="LOCAL-00001" summary="MRV bugfix y algo mas que parece que funciona">
       <created>1551974153540</created>
@@ -220,19 +270,26 @@
       <option name="project" value="LOCAL" />
       <updated>1552421034211</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="2 casi acabado">
+      <created>1558260397910</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1558260397910</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="44502000" />
+    <option name="totallyTimeSpent" value="44615000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="0" width="1920" height="1044" extended-state="6" />
+    <frame x="-4" y="0" width="1928" height="1048" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" weight="0.3131991" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.11632871" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
-      <window_info anchor="bottom" id="Concurrent Activities Diagram" weight="0.32969433" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
       <window_info anchor="bottom" id="Run" order="2" />
@@ -245,7 +302,8 @@
       <window_info anchor="bottom" id="Database Changes" order="9" />
       <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
       <window_info anchor="bottom" id="Terminal" order="11" />
-      <window_info active="true" anchor="bottom" x="1338" y="29" width="574" height="1007" id="Python Console" order="12" type="WINDOWED" visible="true" weight="0.27502635" />
+      <window_info anchor="bottom" x="541" y="199" width="574" height="1007" id="Python Console" order="12" type="WINDOWED" weight="0.27502635" />
+      <window_info anchor="bottom" id="Concurrent Activities Diagram" order="13" weight="0.32969433" />
       <window_info anchor="right" x="0" y="0" width="423" height="642" id="Documentation" order="0" side_tool="true" weight="0.32953313" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="1" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="2" weight="0.25" />
@@ -285,7 +343,8 @@
     <MESSAGE value="MRV bugfix y algo mas que parece que funciona" />
     <MESSAGE value="Juraria que es esto" />
     <MESSAGE value="falta restriccion cuadrados" />
-    <option name="LAST_COMMIT_MESSAGE" value="falta restriccion cuadrados" />
+    <MESSAGE value="2 casi acabado" />
+    <option name="LAST_COMMIT_MESSAGE" value="2 casi acabado" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/entregable-01_mod.py" />
@@ -298,8 +357,20 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/entregable-01.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="72">
-          <caret line="3" selection-start-line="3" selection-end-line="3" />
+        <state relative-caret-position="-17366">
+          <caret line="11" lean-forward="true" selection-start-line="11" selection-end-line="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/entregable-02.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-10777" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="5" lean-forward="true" selection-start-column="5" selection-end-column="5" />
         </state>
       </provider>
     </entry>
