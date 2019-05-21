@@ -205,27 +205,32 @@ def iteración_de_políticas(mdp,k):
 
     estadosMdp = mdp.estados
 
-    #Politica optima, inicialmente random
-    dictPoliticaOptima = {x:random.choice(mdp.A(x)) for x in estadosMdp}
+    # Politica optima, inicialmente random
+    # dictPoliticaOptima = {x:random.choice(mdp.A(x)) for x in estadosMdp}
+
+    # Con politica inicial random da bucles infinitos, con politica inicial con todo
+    # al primer estado no WTF?? en fin...
+    dictPoliticaOptima = {x: mdp.A(x)[0] for x in estadosMdp}
 
     # Valoracion de la politica optima, incialmente a 0
     dictValoracionEstados = {x:0 for x in estadosMdp}
 
     #Algoritmo pag 84 diapositivas
     puntoInicial = time.time()
+
     while True:
         dictValoracionEstados = valoración_respecto_política(dictPoliticaOptima,mdp, k)
-        # print("valoracion respecto a politica: {}".format(dictValoracionEstados))
+        # print("DEBUG: valoracion respecto a politica: {}".format(dictValoracionEstados))
         actializada = False
 
         for estado in estadosMdp:
             pi_s = argmax(mdp.A(estado), lambda x: valoracion_accion_funcion(x, estado, mdp, dictValoracionEstados))
-            # print("pi_s: ",pi_s)
 
             if pi_s != dictPoliticaOptima[estado]:
                 dictPoliticaOptima[estado] = pi_s
                 actializada = True
 
+            # Control de bucles infinitos, no deberia de hacer falta.
             dentrobucle = time.time()
             if dentrobucle-puntoInicial>3:
                 break
@@ -236,16 +241,19 @@ def iteración_de_políticas(mdp,k):
 
 
 
+
+
 mdp_ryc=Rica_y_Conocida()
 
-print("\n---Política del metodo de iteracion de políticas---\n")
+print("\nEjercicio 1)\n")
+print("\n---Política del metodo de iteracion de políticas---")
 
 politica,valoracion = iteración_de_políticas(mdp_ryc,200)
 print("Politica óptima: \t\t{}".format(politica))
 print("Con una valoracion de: {}".format(valoracion))
 
 
-#-----------------------------------------------
+#----------------------------------------------------------------------
 print("\n---Políticas de los ejemplos anteriores---")
 
 pi_ryc_ahorra = {"RC": "No publicidad", "RD": "No publicidad", "PC": "No publicidad", "PD": "No publicidad"}
@@ -314,6 +322,8 @@ print("Como se puede observar, la valoración de la política optima es "
 # que se ha calculado.             
 
 
+print("\n\nEjercicio 2)---")
+
 class MovimientoRobot(MDP):
 
     def __init__(self, recompensa, ruido, descuento):
@@ -365,15 +375,15 @@ class MovimientoRobot(MDP):
                       ("23", "izquierda"):  [("23", 1 - ruido), ("13", mitad_ruido), ("33", mitad_ruido)],
                       ("23", "derecha"):    [("24", 1 - ruido), ("13", mitad_ruido), ("23", mitad_ruido)],
 
-                      ("24", "arriba"): [("14", 1 - ruido), ("24", mitad_ruido), ("23", mitad_ruido)],
-                      ("24", "abajo"): [("34", 1 - ruido), ("23", mitad_ruido), ("23", mitad_ruido)],
-                      ("24", "izquierda"): [("23", 1 - ruido), ("34", mitad_ruido), ("14", mitad_ruido)],
-                      ("24", "derecha"): [("24", 1 - ruido), ("34", mitad_ruido), ("14", mitad_ruido)],
-
-                      # ("24", "arriba"):     [],
-                      # ("24", "abajo"):      [],
-                      # ("24", "izquierda"):  [],
-                      # ("24", "derecha"):    [],
+                      # ("24", "arriba"): [("14", 1 - ruido), ("24", mitad_ruido), ("23", mitad_ruido)],
+                      # ("24", "abajo"): [("34", 1 - ruido), ("23", mitad_ruido), ("23", mitad_ruido)],
+                      # ("24", "izquierda"): [("23", 1 - ruido), ("34", mitad_ruido), ("14", mitad_ruido)],
+                      # ("24", "derecha"): [("24", 1 - ruido), ("34", mitad_ruido), ("14", mitad_ruido)],
+                      #
+                      ("24", "arriba"):     [],
+                      ("24", "abajo"):      [],
+                      ("24", "izquierda"):  [],
+                      ("24", "derecha"):    [],
 
 
                       ("31", "arriba"):     [("21", 1 - ruido),       ("31", mitad_ruido), ("32", mitad_ruido)],
@@ -427,22 +437,19 @@ def política_óptima_cuadrícula(recompensa=-0.04,ruido=0.2,descuento=0.9,iter=
                    }
 
         print("-----------------")
-        print("| " + flechas[dict["11"]]+" | "              + flechas[dict["12"]]+" | " + flechas[dict["13"]]   +" | " + " "+" |")
+        print("| " + flechas[dict["11"]]+" | " + flechas[dict["12"]] +" | " +flechas[dict["13"]]   +" | " + " "+" |")
         print("-----------------")
-        print("| " + flechas[dict["21"]]+" | " + "*" +" | " + flechas[dict["23"]]+" | " + " "                   +" |")
+        print("| " + flechas[dict["21"]]+" | " + "*"                 +" | " + flechas[dict["23"]]  +" | " + " "+" |")
         print("-----------------")
-        print("| " + flechas[dict["31"]]+" | "              + flechas[dict["32"]]+" | " + flechas[dict["33"]]   +" | " + flechas[dict["34"]]+" |")
+        print("| " + flechas[dict["31"]]+" | " + flechas[dict["32"]] +" | " +flechas[dict["33"]]   +" | " + flechas[dict["34"]]+" |")
         print("-----------------")
-
-    if recompensa > 0:
-        print("Es posible que se entre en un bucle infinito ya que la recompensa es positiva.\n"
-              "A los 3 segundos se saldrá del bucle.")
 
 
     mdp_robot = MovimientoRobot(recompensa, ruido, descuento)
     politica, valoracion = iteración_de_políticas(mdp_robot, iter)
 
     print("Recompensa: {}, Ruido: {}, Descuento: {}, Iteraciones: {}".format(recompensa,ruido,descuento,iter))
+    #print(valoracion)
     dibujaCuadricula(politica)
 
 
